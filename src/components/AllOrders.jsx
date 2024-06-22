@@ -11,7 +11,7 @@ import {
   IconButton,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, onSnapshot, query, doc, getDoc } from "firebase/firestore";
 import { db } from "../helpers/firebase";
 
 const AllOrders = () => {
@@ -19,29 +19,40 @@ const AllOrders = () => {
   const [customers, setCustomers] = useState({});
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      const ordersCollection = collection(db, "orders");
-      const ordersSnapshot = await getDocs(ordersCollection);
-      const ordersList = ordersSnapshot.docs.map((doc) => ({
+    const ordersCollection = collection(db, "orders");
+    const q = query(ordersCollection);
+
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
+      const ordersList = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
-      setOrders(ordersList);
 
-      // Fetch customer names
-      const customerIds = [...new Set(ordersList.map((order) => order.clientId))];
-      const customersCollection = collection(db, "customers");
-      const customersSnapshot = await getDocs(
-        query(customersCollection, where("id", "in", customerIds))
-      );
-      const customersMap = {};
-      customersSnapshot.docs.forEach((doc) => {
-        customersMap[doc.id] = doc.data().name;
+      // Fetch customer names for each order
+      const customerPromises = ordersList.map(async (order) => {
+        if (order.clientId && !customers[order.clientId]) {
+          const customerDoc = await getDoc(
+            doc(db, "customers", order.clientId)
+          );
+          if (customerDoc.exists()) {
+            return { [order.clientId]: customerDoc.data().name };
+          }
+        }
+        return null;
       });
-      setCustomers(customersMap);
-    };
 
-    fetchOrders();
+      const customerResults = await Promise.all(customerPromises);
+      const newCustomers = Object.assign(
+        {},
+        ...customerResults.filter(Boolean)
+      );
+
+      setCustomers((prevCustomers) => ({ ...prevCustomers, ...newCustomers }));
+      setOrders(ordersList);
+    });
+
+    // Clean up the listener on component unmount
+    return () => unsubscribe();
   }, []);
 
   const formatDate = (dateString) => {
@@ -51,7 +62,7 @@ const AllOrders = () => {
 
   return (
     <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="orders table">
+      <Table>
         <TableHead>
           <TableRow>
             <TableCell>Order Time</TableCell>
@@ -73,25 +84,22 @@ const AllOrders = () => {
               <TableCell>
                 <Tooltip
                   title={
-                    <>
-                      <p>
-                        <strong>Delivery Guy:</strong>{" "}
-                        {order.deliveryGuy?.name || "N/A"}
-                      </p>
-                      <p>
-                        <strong>Location:</strong>{" "}
-                        {order.location?.name || "N/A"}
-                      </p>
-                      <p>
-                        <strong>Orders:</strong>
-                      </p>
-                      {order.orders?.map((item, index) => (
-                        <div key={index}>
-                          {item.foodName} x {item.quantity} - GHC{" "}
-                          {item.foodPrice.toFixed(2)}
-                        </div>
-                      ))}
-                    </>
+                    <React.Fragment>
+                      <strong>Delivery Guy:</strong>{" "}
+                      {order.deliveryGuy?.name || "N/A"}
+                      <br />
+                      <strong>Location:</strong> {order.location?.name || "N/A"}
+                      <br />
+                      <strong>Orders:</strong>
+                      <ul>
+                        {order.orders?.map((item, index) => (
+                          <li key={index}>
+                            {item.foodName} x {item.quantity} - GHC{" "}
+                            {item.foodPrice.toFixed(2)}
+                          </li>
+                        ))}
+                      </ul>
+                    </React.Fragment>
                   }
                 >
                   <IconButton>
