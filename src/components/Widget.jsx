@@ -45,7 +45,7 @@ const Widget = ({ title, collectionName }) => {
       data = {
         icon: <MonetizationOnOutlinedIcon className="icon" />,
         link: "View revenue details",
-        bgColor: "#e8f5e9", // Light green
+        bgColor: "#e8f5e9", 
       };
       break;
     case "ORDERS":

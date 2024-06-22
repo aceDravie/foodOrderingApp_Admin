@@ -11,6 +11,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import {Typography} from "@mui/material"
 
 const MostPurchased = () => {
   const [data, setData] = useState([]);
@@ -43,7 +44,7 @@ const MostPurchased = () => {
 
   return (
     <div>
-      <h2>Most Purchased</h2>
+      <Typography sx={{fontWeight: "bold", color: "#333"}}>MOST PURCHASED</Typography>
       <ResponsiveContainer width="100%" height={400}>
         <BarChart
           data={data}
