@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import { AuthContext } from "./context/AuthContext";
 import Dashboard from "./pages/Dashboard";
 import RootLayout from "./layouts/RootLayout";
+import AllFoods from "./pages/AllFoods";
 
 const App = () => {
   const { currentUser } = useContext(AuthContext);
@@ -29,6 +30,8 @@ const App = () => {
             }
           >
             <Route path="" element={<Dashboard />}>
+            </Route>
+            <Route path="allFoods" element={<AllFoods />}>
             </Route>
           </Route>
         </Routes>

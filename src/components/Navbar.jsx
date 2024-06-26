@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
+import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import LocalDiningIcon from "@mui/icons-material/LocalDining";
@@ -28,7 +29,7 @@ import { signOut } from "firebase/auth";
 import { AuthContext } from "../context/AuthContext";
 import Avatar from "@mui/material/Avatar";
 
-const settings = ["Account", "Logout"];
+const settings = ["Profile", "Logout"];
 
 function Navbar() {
   const [anchorElNav, setAnchorElNav] = useState(null);
@@ -38,7 +39,7 @@ function Navbar() {
   const [tempOrders, setTempOrders] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [showNavbar, setShowNavbar] = useState(true);
-  const { clientID } = useParams();
+  const { adminID } = useParams();
   const { currentUser, dispatch } = useContext(AuthContext);
   const [openChangeProfile, setOpenChangeProfile] = useState(false);
   const navigate = useNavigate();
@@ -69,10 +70,10 @@ function Navbar() {
 
   const handleOpenDialog = async () => {
     setDialogOpen(true);
-    if (clientID) {
+    if (adminID) {
       const q = query(
         collection(db, "tempOrders"),
-        where("clientId", "==", clientID)
+        where("clientId", "==", adminID)
       );
       const querySnapshot = await getDocs(q);
       const orders = querySnapshot.docs.map((doc) => ({
@@ -117,10 +118,10 @@ function Navbar() {
   }, [nickName]);
 
   useEffect(() => {
-    if (clientID) {
+    if (adminID) {
       const q = query(
         collection(db, "tempOrders"),
-        where("clientId", "==", clientID)
+        where("clientId", "==", adminID)
       );
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
         setTempOrdersCount(querySnapshot.size);
@@ -128,7 +129,7 @@ function Navbar() {
 
       return () => unsubscribe();
     }
-  }, [clientID]);
+  }, [adminID]);
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -164,7 +165,7 @@ function Navbar() {
   const handleMenuItemClick = (setting) => {
     if (setting === "Logout") {
       handleLogout();
-    } else if (setting === "Account") {
+    } else if (setting === "Profile") {
       handleOpenChangeProfile();
     }
     handleCloseUserMenu();
@@ -194,7 +195,7 @@ function Navbar() {
               variant="h6"
               noWrap
               component={Link}
-              to={`/dashboard/${clientID}`}
+              to={`/dashboard/${adminID}`}
               sx={{
                 mr: 2,
                 display: { xs: "none", md: "flex" },
@@ -260,6 +261,12 @@ function Navbar() {
                         {nickName}
                       </span>
                     </Typography>
+                    <Button
+                      component={Link}
+                      to={`/dashboard/${adminID}/allFoods`}
+                    >
+                      All Foods
+                    </Button>
                   </Box>
                 </MenuItem>
               </Menu>
@@ -271,7 +278,7 @@ function Navbar() {
               variant="h5"
               noWrap
               component={Link}
-              to={`/dashboard/${clientID}`}
+              to={`/dashboard/${adminID}`}
               sx={{
                 display: { xs: "flex", md: "none" },
                 flexGrow: 1,
@@ -312,6 +319,9 @@ function Navbar() {
                     {nickName}
                   </span>{" "}
                 </Typography>
+                <Button component={Link} to={`/dashboard/${adminID}/allFoods`}>
+                  All Foods
+                </Button>
               </Box>
             </Box>
 
@@ -371,7 +381,6 @@ function Navbar() {
           </Toolbar>
         </Container>
       </AppBar>
-     
       ;
     </div>
   );
