@@ -12,7 +12,7 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import LocalDiningIcon from "@mui/icons-material/LocalDining";
 import Badge from "@mui/material/Badge";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { PersonAdd, PostAdd, AddShoppingCart } from "@mui/icons-material";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { db, auth } from "../helpers/firebase";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
@@ -28,6 +28,8 @@ import {
 import { signOut } from "firebase/auth";
 import { AuthContext } from "../context/AuthContext";
 import Avatar from "@mui/material/Avatar";
+import AddDeliveryGuy from "../mod/AddDeliveryGuy";
+import AddFood from "../mod/AddFood";
 
 const settings = ["Profile", "Logout"];
 
@@ -41,15 +43,24 @@ function Navbar() {
   const [showNavbar, setShowNavbar] = useState(true);
   const { adminID } = useParams();
   const { currentUser, dispatch } = useContext(AuthContext);
-  const [openChangeProfile, setOpenChangeProfile] = useState(false);
+  const [openAddDeliveryGuy, setOpenAddDeliveryGuy] = useState(false);
+  const [openAddFood, setOpenAddFood] = useState(false);
   const navigate = useNavigate();
 
-  const handleOpenChangeProfile = () => {
-    setOpenChangeProfile(true);
+  const handleOpenAddDeliveryGuy = () => {
+    setOpenAddDeliveryGuy(true);
   };
 
-  const handleCloseChangeProfile = () => {
+  const handleOpenAddFood = () => {
+    setOpenAddFood(true);
+  };
+
+  const handleCloseAddDeliveryGuy = () => {
     setOpenChangeProfile(false);
+  };
+
+  const handleCloseAddFood = () => {
+    setOpenAddFood(false);
   };
 
   const handleOpenNavMenu = (event) => {
@@ -326,20 +337,25 @@ function Navbar() {
             </Box>
 
             <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title="Open Cart">
+              <Tooltip title="Add Delivery Guy">
                 <IconButton
-                  onClick={handleOpenDialog}
+                  onClick={handleOpenAddDeliveryGuy}
                   sx={{ p: 0 }}
                   size="small"
                 >
                   <Badge badgeContent={tempOrdersCount} color="primary">
-                    <ShoppingCartIcon color="action" />
+                    <PersonAdd color="action" />
                   </Badge>
                 </IconButton>
               </Tooltip>
-              <Tooltip title="My Orders">
+              <Tooltip title="Add Food">
+                <IconButton onClick={() => setOpenAddFood(true)}>
+                  <PostAdd />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Add Food Category">
                 <IconButton component={Link} to={"orders"}>
-                  <PlaylistAddCheckIcon />
+                  <AddShoppingCart />
                 </IconButton>
               </Tooltip>
               <Tooltip title="Account settings">
@@ -381,7 +397,18 @@ function Navbar() {
           </Toolbar>
         </Container>
       </AppBar>
-      ;
+
+      <AddDeliveryGuy
+        open={openAddDeliveryGuy}
+        onOpen={handleOpenAddDeliveryGuy}
+        onClose={() => setOpenAddDeliveryGuy(false)}
+      />
+
+      <AddFood
+        open={openAddFood}
+        onOpen={handleOpenAddFood}
+        onClose={() => setOpenAddFood(false)}
+      />
     </div>
   );
 }
