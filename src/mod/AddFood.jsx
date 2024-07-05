@@ -11,6 +11,10 @@ import {
   Snackbar,
   Alert,
   Box,
+  Select,
+  FormControl,
+  InputLabel,
+  MenuItem,
 } from "@mui/material";
 import {
   collection,
@@ -32,8 +36,10 @@ const AddFood = ({ open, onOpen, onClose }) => {
   const [image, setImage] = useState("");
   const [ratings, setRatings] = useState("");
   const [category, setCategory] = useState("");
+  const [categories, setCategories] = useState([]);
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
+  const [tempArray, setTempArray] = useState([]);
   const [_open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -75,14 +81,30 @@ const AddFood = ({ open, onOpen, onClose }) => {
     file && uploadFile();
   }, [file]);
 
+  const handleChange = () => {};
   const handleClose = () => {
     setOpen(false);
   };
+
+  useEffect(() => {
+    const fetchCat = async () => {
+      const q = query(collection(db, "category"));
+      let catName = [];
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+         catName.push(doc.data().name);
+      });
+      setCategories(catName)
+    };
+
+    fetchCat();
+  }, [categories]);
 
   const handleSubmit = async (e) => {
     setMessage("");
     e.preventDefault();
 
+    console.log(tempArray);
     const foodData = {
       name,
       price: parseInt(price),
@@ -186,16 +208,18 @@ const AddFood = ({ open, onOpen, onClose }) => {
               value={ratings}
               onChange={(e) => setRatings(e.target.value)}
             />
-            <TextField
-              required
-              margin="dense"
-              id="category"
-              label="Category"
-              type="text"
-              fullWidth
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            />
+            <FormControl fullWidth margin="dense">
+              <InputLabel>Category</InputLabel>
+              <Select
+                value={category}
+                label="Category"
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                {categories.map((ele) => (
+                  <MenuItem value={ele}>{ele}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </DialogContent>
           <DialogActions>
             <Button color="error" variant="outlined" onClick={onClose}>

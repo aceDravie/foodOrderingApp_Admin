@@ -14,7 +14,7 @@ import { db } from "../helpers/firebase";
 
 const AddFoodCategory = ({ open, onOpen, onClose }) => {
   const [_open, setOpen] = useState(false);
-  const [catName, setCatName] = useState(false);
+  const [catName, setCatName] = useState("");
   const [message, setMessage] = useState("");
 
   const handleClose = () => {
@@ -26,7 +26,8 @@ const AddFoodCategory = ({ open, onOpen, onClose }) => {
     e.preventDefault();
 
     const foodData = {
-      name: catName
+      name: catName,
+      type: catName,
     };
 
     try {
@@ -56,6 +57,7 @@ const AddFoodCategory = ({ open, onOpen, onClose }) => {
               onChange={(e) => setCatName(e.target.value)}
             />
           </DialogContent>
+
           <DialogActions>
             <Button color="error" variant="outlined" onClick={onClose}>
               Cancel

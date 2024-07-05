@@ -8,9 +8,11 @@ import { useEffect, useState } from "react";
 import { collection, query, getDocs } from "firebase/firestore";
 import { db } from "../helpers/firebase";
 import "../styles/widget.css";
+import { Link, useParams } from "react-router-dom";
 
 const Widget = ({ title, collectionName }) => {
   const [value, setValue] = useState(0);
+  const { adminID } = useParams();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,13 +41,15 @@ const Widget = ({ title, collectionName }) => {
         icon: <PersonOutlinedIcon className="icon" />,
         link: "See all customers",
         bgColor: "#e3f2fd", // Light blue
+        to: `/dashboard/${adminID}/allFoods`,
       };
       break;
     case "TOTAL REVENUE":
       data = {
         icon: <MonetizationOnOutlinedIcon className="icon" />,
         link: "View revenue details",
-        bgColor: "#e8f5e9", 
+        bgColor: "#e8f5e9",
+        to: "/revenue",
       };
       break;
     case "ORDERS":
@@ -53,6 +57,7 @@ const Widget = ({ title, collectionName }) => {
         icon: <ShoppingCartOutlinedIcon className="icon" />,
         link: "View all orders",
         bgColor: "#fff3e0", // Light orange
+        to: `/dashboard/${adminID}`,
       };
       break;
     default:
@@ -78,7 +83,9 @@ const Widget = ({ title, collectionName }) => {
         <span className="counter">
           {title === "TOTAL REVENUE" ? `GHC ${value.toFixed(2)}` : value}
         </span>
-        <span className="link">{data.link}</span>
+        <Link to={data.to} className="link">
+          {data.link}
+        </Link>
       </div>
       <div className="right">
         <div className="percentage positive">
