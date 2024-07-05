@@ -86,7 +86,7 @@ const AddDeliveryGuy = ({ open, onOpen, onClose }) => {
               Cancel
             </Button>
             <Button type="submit" color="primary">
-              Change
+              Add
             </Button>
           </DialogActions>
         </form>

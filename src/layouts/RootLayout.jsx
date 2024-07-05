@@ -9,7 +9,7 @@ const RootLayout = () => {
     <Box>
       <Navbar />
 
-      <Box my={3}>
+      <Box sx={{marginTop: "5rem"}}>
         <div className="widgets">
           <Widget title="CUSTOMERS" collectionName="customers" />
           <Widget title="TOTAL REVENUE" collectionName="orders" />

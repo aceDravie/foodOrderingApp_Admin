@@ -15,7 +15,7 @@ import Badge from "@mui/material/Badge";
 import { PersonAdd, PostAdd, AddShoppingCart } from "@mui/icons-material";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { db, auth } from "../helpers/firebase";
-import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
+
 import {
   collection,
   query,
@@ -30,6 +30,8 @@ import { AuthContext } from "../context/AuthContext";
 import Avatar from "@mui/material/Avatar";
 import AddDeliveryGuy from "../mod/AddDeliveryGuy";
 import AddFood from "../mod/AddFood";
+import EditFood from "../mod/EditFood";
+import AddFoodCategory from "../mod/AddFoodCategory";
 
 const settings = ["Profile", "Logout"];
 
@@ -45,6 +47,8 @@ function Navbar() {
   const { currentUser, dispatch } = useContext(AuthContext);
   const [openAddDeliveryGuy, setOpenAddDeliveryGuy] = useState(false);
   const [openAddFood, setOpenAddFood] = useState(false);
+  const [openEditFood, setOpenEditFood] = useState(false);
+  const [openAddFoodCategory, setOpenAddFoodCategory] = useState(false)
   const navigate = useNavigate();
 
   const handleOpenAddDeliveryGuy = () => {
@@ -54,6 +58,12 @@ function Navbar() {
   const handleOpenAddFood = () => {
     setOpenAddFood(true);
   };
+  const handleOpenEditFood = () => {
+    setOpenEditFood(true);
+  };
+  const handleOpenAddFoodCategory = () => {
+    setOpenAddFoodCategory(true);
+  };
 
   const handleCloseAddDeliveryGuy = () => {
     setOpenChangeProfile(false);
@@ -61,6 +71,12 @@ function Navbar() {
 
   const handleCloseAddFood = () => {
     setOpenAddFood(false);
+  };
+  const handleCloseEditFood = () => {
+    setOpenEditFood(false);
+  };
+  const handleCloseAddFoodCategory = () => {
+    setOpenAddFoodCategory(false);
   };
 
   const handleOpenNavMenu = (event) => {
@@ -354,7 +370,7 @@ function Navbar() {
                 </IconButton>
               </Tooltip>
               <Tooltip title="Add Food Category">
-                <IconButton component={Link} to={"orders"}>
+                <IconButton on onClick={()=> setOpenAddFoodCategory(true) }>
                   <AddShoppingCart />
                 </IconButton>
               </Tooltip>
@@ -409,6 +425,17 @@ function Navbar() {
         onOpen={handleOpenAddFood}
         onClose={() => setOpenAddFood(false)}
       />
+      <EditFood
+        open={openEditFood}
+        onOpen={handleOpenEditFood}
+        onClose={() => setOpenEditFood(false)}
+      />
+      <AddFoodCategory
+        open={openAddFoodCategory}
+        onOpen={handleOpenAddFoodCategory}
+        onClose={() => setOpenAddFoodCategory(false)}
+      />
+     
     </div>
   );
 }

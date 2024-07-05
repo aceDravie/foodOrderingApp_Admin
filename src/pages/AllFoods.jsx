@@ -21,14 +21,13 @@ import {
   doc,
   onSnapshot,
 } from "firebase/firestore";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+
 import EditFood from "../mod/EditFood";
-import AddFood from "../mod/AddFood";
+
 
 const AllFoods = () => {
   const [foods, setFoods] = useState([]);
   const [openEditFood, setOpenEditFood] = useState(false);
-  const [openAddFood, setOpenAddFood] = useState(false);
 
   const handleOpenEditFood = () => {
     setOpenEditFood(true);
@@ -36,13 +35,6 @@ const AllFoods = () => {
 
   const handleCloseEditFood = () => {
     setOpenEditFood(false);
-  };
-  const handleOpenAddFood = () => {
-    setOpenAddFood(true);
-  };
-
-  const handleCloseAddFood = () => {
-    setOpenAddFood(false);
   };
 
   useEffect(() => {
@@ -79,11 +71,6 @@ const AllFoods = () => {
         <Typography variant="h5" sx={{ fontWeight: "bold" }}>
           ALL FOODS
         </Typography>
-        <Button>
-          <IconButton onClick={handleOpenAddFood}>
-            <AddCircleOutlineIcon />
-          </IconButton>
-        </Button>
       </div>
 
       <Box>
@@ -150,11 +137,6 @@ const AllFoods = () => {
         open={openEditFood}
         onOpen={handleOpenEditFood}
         onClose={handleCloseEditFood}
-      />
-      <AddFood
-        open={openAddFood}
-        onOpen={handleOpenAddFood}
-        onClose={handleCloseAddFood}
       />
     </>
   );
