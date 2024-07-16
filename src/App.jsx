@@ -8,7 +8,7 @@ import { AuthContext } from "./context/AuthContext";
 import Dashboard from "./pages/Dashboard";
 import RootLayout from "./layouts/RootLayout";
 import AllFoods from "./pages/AllFoods";
-
+import Customers from "./components/Customers";
 const App = () => {
   const { currentUser } = useContext(AuthContext);
 
@@ -32,6 +32,8 @@ const App = () => {
             <Route path="" element={<Dashboard />}>
             </Route>
             <Route path="allFoods" element={<AllFoods />}>
+            </Route>
+            <Route path="customers" element={<Customers />}>
             </Route>
           </Route>
         </Routes>

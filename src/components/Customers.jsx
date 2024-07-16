@@ -12,7 +12,6 @@ import {
   Button,
   Menu,
   MenuItem,
- 
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { collection, onSnapshot, query, doc, getDoc } from "firebase/firestore";
@@ -21,9 +20,8 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
 
-const AllOrders = () => {
-  const [orders, setOrders] = useState([]);
-  const [customers, setCustomers] = useState({});
+const Customers = () => {
+  const [customers, setCustomers] = useState([]);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -37,12 +35,10 @@ const AllOrders = () => {
     console.log("excel printing");
     const workBook = XLSX.utils.book_new();
     const workSheet = XLSX.utils.json_to_sheet(
-      orders.map((order) => ({
-        "OrderTime": order.orderTime,
-        "Order Type": order.orderType,
-        "Total Price": order.totalPrice,
-        "Customer Name": customers[order.clientId] || "Unknown",
-        "DeliveryGuy Name": order.deliveryGuy?.name || "N/A",
+      customers.map((customer) => ({
+        "Customer Name": customers[customer.clientId] || "Unknown",
+        "Customer Email": customer.email,
+        "Customer Contact": customer.contact,
       }))
     );
 
@@ -54,38 +50,37 @@ const AllOrders = () => {
     console.log("pdf printing");
 
     const doc = new jsPDF();
-    doc.text("All Orders", 20, 10);
+    doc.text("All Customers", 20, 10);
     doc.autoTable({
-      head: [["Time", "Type", "Price", "Customer Name", "DeliveryGuy Name"]],
-      body: orders.map((order) => [
-        order.orderTime,
-        order.orderType,
-        order.totalPrice,
-        customers[order.clientId] || "Unknown",
-        order.deliveryGuy?.name || "N/A",
+      head: [["Name", "Email", "Contact"]],
+      body: customers.map((customer) => [
+        customers[customer.clientId] || "Unknown",
+        customer.email,
+        customer.contact,
+        
+        
       ]),
     });
-    doc.save("Orders.pdf");
+    doc.save("Customers.pdf");
   };
-
   useEffect(() => {
-    const ordersCollection = collection(db, "orders");
-    const q = query(ordersCollection);
+    const customerCollection = collection(db, "customers");
+    const q = query(customerCollection);
 
     const unsubscribe = onSnapshot(q, async (snapshot) => {
-      const ordersList = snapshot.docs.map((doc) => ({
+      const customerList = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
 
-      // Fetch customer names for each order
-      const customerPromises = ordersList.map(async (order) => {
-        if (order.clientId && !customers[order.clientId]) {
+      // Fetch customer names for each customer
+      const customerPromises = customerList.map(async (customer) => {
+        if (customer.clientId && !customers[customer.clientId]) {
           const customerDoc = await getDoc(
-            doc(db, "customers", order.clientId)
+            doc(db, "customers", customer.clientId)
           );
           if (customerDoc.exists()) {
-            return { [order.clientId]: customerDoc.data().name };
+            return { [customer.clientId]: customerDoc.data().name };
           }
         }
         return null;
@@ -98,20 +93,18 @@ const AllOrders = () => {
       );
 
       setCustomers((prevCustomers) => ({ ...prevCustomers, ...newCustomers }));
-      setOrders(ordersList);
+      setOrders(customerList);
     });
 
     // Clean up the listener on component unmount
     return () => unsubscribe();
   }, []);
-
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleString();
   };
 
   const showPrints = () => {};
-
   return (
     <>
       <div>
@@ -165,49 +158,22 @@ const AllOrders = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Order Time</TableCell>
-              <TableCell>Order Type</TableCell>
-              <TableCell>Total Price GH₵</TableCell>
               <TableCell>Customer Name</TableCell>
-              <TableCell>Details</TableCell>
+              <TableCell>Customer Email</TableCell>
+              <TableCell>Customer Contact</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders.map((order) => (
-              <TableRow key={order.id}>
-                <TableCell>{formatDate(order.orderTime)}</TableCell>
-                <TableCell>{order.orderType}</TableCell>
+            {customers.map((customer) => (
+              <TableRow key={customer.id}>
                 <TableCell>
-                  GH₵ {parseFloat(order.totalPrice).toFixed(2)}
+                  {customers[customer.clientId] || "Unknown"}
                 </TableCell>
-                <TableCell>{customers[order.clientId] || "Unknown"}</TableCell>
+                <TableCell>{customer.email}</TableCell>
                 <TableCell>
-                  <Tooltip
-                    title={
-                      <React.Fragment>
-                        <strong>Delivery Guy:</strong>{" "}
-                        {order.deliveryGuy?.name || "N/A"}
-                        <br />
-                        <strong>Location:</strong>{" "}
-                        {order.location?.name || "N/A"}
-                        <br />
-                        <strong>Orders:</strong>
-                        <ul>
-                          {order.orders?.map((item, index) => (
-                            <li key={index}>
-                              {item.foodName} x {item.quantity} - GH₵{" "}
-                              {item.foodPrice.toFixed(2)}
-                            </li>
-                          ))}
-                        </ul>
-                      </React.Fragment>
-                    }
-                  >
-                    <IconButton>
-                      <InfoIcon />
-                    </IconButton>
-                  </Tooltip>
+                {customer.contact}
                 </TableCell>
+                <TableCell></TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -217,4 +183,4 @@ const AllOrders = () => {
   );
 };
 
-export default AllOrders;
+export default Customers;

@@ -41,7 +41,7 @@ const Widget = ({ title, collectionName }) => {
         icon: <PersonOutlinedIcon className="icon" />,
         link: "See all customers",
         bgColor: "#e3f2fd", // Light blue
-        to: `/dashboard/${adminID}/allFoods`,
+        to: `/dashboard/${adminID}/customers`,
       };
       break;
     case "TOTAL REVENUE":
@@ -81,7 +81,7 @@ const Widget = ({ title, collectionName }) => {
       <div className="left">
         <span className="title">{title}</span>
         <span className="counter">
-          {title === "TOTAL REVENUE" ? `GHC ${value.toFixed(2)}` : value}
+          {title === "TOTAL REVENUE" ? `GH₵ ${value.toFixed(2)}` : value}
         </span>
         <Link to={data.to} className="link">
           {data.link}

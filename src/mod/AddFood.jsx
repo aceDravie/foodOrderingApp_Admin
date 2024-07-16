@@ -122,6 +122,7 @@ const AddFood = ({ open, onOpen, onClose }) => {
 
       setName("");
       setPrice("");
+      setImage("");
       setQuantity("");
       setRatings("");
       setCategory("");
